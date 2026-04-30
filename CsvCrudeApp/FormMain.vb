@@ -1,4 +1,4 @@
-﻿Imports System.IO
+Imports System.IO
 
 Public Class FormMain
 
@@ -64,7 +64,7 @@ Public Class FormMain
     ' ================= LOAD CSV =================
     Private Sub LoadCSV()
 
-        dt.Rows.Clear()   ' ✅ Clear ROWS only — never touch columns
+        dt.Rows.Clear()
 
         If Not File.Exists(filePath) Then
             MessageBox.Show("CSV file not found")
@@ -72,6 +72,10 @@ Public Class FormMain
         End If
 
         Dim lines = File.ReadAllLines(filePath)
+        Dim seenIDs As New HashSet(Of Integer)()
+
+        ' ✅ Collect duplicate IDs to show in message
+        Dim duplicateIDs As New List(Of String)()
 
         For i As Integer = 1 To lines.Length - 1
 
@@ -85,7 +89,14 @@ Public Class FormMain
             Dim idVal As Integer
             If Not Integer.TryParse(parts(0).Trim(), idVal) Then Continue For
 
-            ' ✅ Wrap in try-catch to skip any bad rows safely
+            ' ✅ If duplicate — log it and skip
+            If seenIDs.Contains(idVal) Then
+                duplicateIDs.Add(idVal.ToString())
+                Continue For
+            End If
+
+            seenIDs.Add(idVal)
+
             Try
                 dt.Rows.Add(
                 idVal,
@@ -96,15 +107,28 @@ Public Class FormMain
                 parts(5).Trim()
             )
             Catch ex As Exception
-                ' Skip malformed rows silently
                 Continue For
             End Try
 
         Next
 
+        ' ✅ Show warning if any duplicates were found
+        If duplicateIDs.Count > 0 Then
+            MessageBox.Show(
+        "Duplicate ID(s) found Remove Duplicates :" & Environment.NewLine &
+        String.Join(", ", duplicateIDs),
+        "Duplicate ID Warning",
+        MessageBoxButtons.OK,
+        MessageBoxIcon.Warning
+    )
+            ' ✅ Close main form after user clicks OK
+            Me.Close()
+            Exit Sub
+        End If
+
         dt.DefaultView.Sort = "ID ASC"
-        ' ✅ Do NOT re-assign DataSource here — binding already set in Load
         dgvData.ClearSelection()
+        SaveAllCSV()
 
     End Sub
 
