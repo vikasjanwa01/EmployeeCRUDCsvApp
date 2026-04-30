@@ -1,4 +1,4 @@
-﻿Public Class FormEdit
+Public Class FormEdit
 
     Public resultData As String()
     Private originalID As String = ""
@@ -212,14 +212,9 @@
         Dim empType As String = If(rbFullTime.Checked, "Full-Time", "Part-Time")
 
         ' ✅ Confirmation before save
-        Dim result As DialogResult = MessageBox.Show(
-        "Do you want to save this data?",
-        "Confirm Save",
-        MessageBoxButtons.YesNo,
-        MessageBoxIcon.Question
-)
-
-        If result = DialogResult.No Then Exit Sub
+        Dim frm As New FormConfirm("Do you want to save this data?")
+        frm.ShowDialog(Me)
+        If frm.UserChoice = False Then Exit Sub
 
         resultData = {
             txtID.Text,
@@ -263,4 +258,7 @@
         End If
     End Sub
 
+    Private Sub rbMale_CheckedChanged(sender As Object, e As EventArgs) Handles rbMale.CheckedChanged
+
+    End Sub
 End Class
