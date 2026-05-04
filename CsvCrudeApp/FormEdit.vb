@@ -6,11 +6,19 @@ Public Class FormEdit
     Public Sub New()
         InitializeComponent()
 
+
+        cmbDepartment.Items.Insert(0, "-- Select Department --")
+        cmbDepartment.SelectedIndex = 0
+
+
         cmbDepartment.Items.AddRange({
         "IT", "HR", "Finance", "Marketing",
         "Operations", "Sales", "Legal", "R&D"
     })
     End Sub
+
+
+
 
 
     Private Sub txtName_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtName.KeyPress
